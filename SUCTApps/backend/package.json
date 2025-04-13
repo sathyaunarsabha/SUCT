@@ -1,0 +1,12 @@
+{
+    "name": "SUCTApps",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0"
+    }
+}
