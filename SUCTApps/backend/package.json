@@ -3,10 +3,16 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "start": "node app.js"
+        "start": "node app.js",
+        "prisma:generate": "prisma generate",
+        "prisma:migrate": "prisma migrate dev --name init"
     },
     "dependencies": {
         "dotenv": "^16.5.0",
-        "express": "^5.1.0"
+        "express": "^5.1.0",
+        "@prisma/client": "^5.0.0"
+    },
+    "devDependencies": {
+        "prisma": "^5.0.0"
     }
 }

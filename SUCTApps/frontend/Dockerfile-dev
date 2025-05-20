@@ -19,12 +19,21 @@ FROM node:18
 WORKDIR /app
 
 # Copy package.json and package-lock.json first (this allows Docker to cache the dependencies)
-COPY frontend/package.json frontend/package-lock.json ./
+COPY package.json package-lock.json ./
+
+#ENV NODE_ENV=test can be used for testing
+#if (process.env.NODE_ENV === 'development') {
+#    console.log("Running in dev mode");
+#}
+#mode: process.env.NODE_ENV === 'production' ? 'production' : 'development'
+ENV NODE_ENV=development 
+RUN npm install 
 
 # Copy the rest of the frontend application code
-COPY frontend/src ./src
-COPY frontend/public ./public
+#COPY src /app/src #Bind mount in yml file takes care of these steps
+#COPY public /app/public
 
-RUN npm install && npm run build
+#RUN npm run build #Bind mount in yml file takes care of these steps
+
 EXPOSE 3000
 CMD ["npm", "start"]
