@@ -1,0 +1,94 @@
+#version: "3.8"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-dev
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./backend:/app # Use bind mount for dev, Sync local backend files to container
+    working_dir: /app
+    command: ["npm", "start"]
+    depends_on:
+      - frontend
+    mem_limit: 128m
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-dev
+    working_dir: /app
+    volumes:
+      - ./frontend:/app # Use bind mount for dev, Sync local frontend files to container
+    ports:
+      - "3000:3000"
+    command: ["npm", "start"]
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Needed for file change detection in Docker
+    mem_limit: 128m
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+      MYSQL_INITDB_SKIP_TZINFO: 1  # Optional: Skip time zone info for quicker startup
+      MYSQL_EXTRA_FLAGS: --innodb-buffer-pool-size=256M # Limit memory usage for buffering to 128MB
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    mem_limit: 256m
+
+  nocodb:
+    image: nocodb/nocodb:latest
+    container_name: nocodb
+    ports:
+      - "8081:8080"  
+    volumes:
+      - nocodb_data:/usr/app/data
+    environment:
+      - DB_URL=mysql://appuser:apppass@db/myapp  # Pointing NocoDB to MySQL
+    mem_limit: 192m
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8082:8080"  
+    depends_on:
+      - mysql_db
+    mem_limit: 64m
+  
+  phpapps:
+    image: php:8.2-apache
+    volumes:
+      - ./php-app:/var/www/html
+    ports:
+      - "8083:80"
+    mem_limit: 128m
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+      - frontend
+      - phpapps
+      - nocodb
+      - adminer
+    mem_limit: 128m
+
+volumes:
+  mysql_data:
+  nocodb_data:
