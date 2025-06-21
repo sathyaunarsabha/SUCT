@@ -15,7 +15,7 @@
 #EXPOSE 3000
 #C0MD [ "npm", "start" ]
 
-FROM node:18
+FROM node:16
 WORKDIR /app
 
 # Copy package.json and package-lock.json for backend dependencies
