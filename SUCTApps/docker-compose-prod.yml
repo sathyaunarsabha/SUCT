@@ -7,7 +7,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
     volumes:
       - backend-data:/app/data # Only persist necessary data
     working_dir: /app
@@ -68,7 +68,7 @@ services:
   phpapps:
     image: php:8.2-apache
     volumes:
-      - ./php-app:/var/www/html
+      - ./php-apps:/var/www/html
     ports:
       - "8083:80"
     mem_limit: 128m
@@ -79,8 +79,8 @@ services:
       - "443:443"
       - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/nginx.prod.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro # Generate the letsencrypt keys using cerbot or other way
     depends_on:
       - backend
       - frontend
