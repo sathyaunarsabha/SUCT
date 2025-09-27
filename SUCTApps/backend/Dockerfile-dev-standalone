@@ -1,0 +1,36 @@
+# Use official Node.js image
+#FROM node:20
+
+# Create app directory
+#WORKDIR /usr/src/app
+
+# Copy and install dependencies
+#COPY package*.json ./
+#RUN npm install
+
+# Copy source files
+#COPY . .
+
+# Expose port and start app
+#EXPOSE 3000
+#C0MD [ "npm", "start" ]
+
+FROM node:16
+WORKDIR /app
+
+# Copy package.json and package-lock.json for backend dependencies
+COPY package.json package-lock.json ./
+
+#ENV NODE_ENV=test can be used for testing
+#if (process.env.NODE_ENV === 'development') {
+#    console.log("Running in dev mode");
+#}
+#mode: process.env.NODE_ENV === 'production' ? 'production' : 'development'
+ENV NODE_ENV=development 
+RUN npm install
+
+# Copy the backend source code into the container
+# COPY . /app # Bind mount in yml file takes care of this.
+
+EXPOSE 5000
+CMD ["node", "app.js"]
